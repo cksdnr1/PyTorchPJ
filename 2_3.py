@@ -138,7 +138,7 @@ class Model(pl.LightningModule):
             nn.Linear(256,256),
             nn.BatchNorm1d(256),
             nn.LeakyReLU(0.01),
-            nn.Dropout(0.01),
+            nn.Dropout(0.1),
             nn.Linear(256,10),
         )
 
