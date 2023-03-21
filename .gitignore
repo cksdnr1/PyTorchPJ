@@ -14,3 +14,7 @@ logs
 aicamp
 lightning_logs
 pip-selfcheck.json
+CIFAR100
+CIFAR10
+F-MNIST
+MNIST
