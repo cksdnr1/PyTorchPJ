@@ -9,4 +9,8 @@
 [Ss]cripts
 pyvenv.cfg
 .venv
+tb_logs
+logs
+aicamp
+lightning_logs
 pip-selfcheck.json
