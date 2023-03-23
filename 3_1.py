@@ -153,15 +153,16 @@ class CNN(pl.LightningModule):
     def __init__(self):
         super(CNN, self).__init__()
         self.layers = nn.Sequential(
-            nn.Conv2d(1, 32, (4, 4), padding=1),
-            nn.LeakyReLU(0.01),
+            nn.Conv2d(1, 64, (3, 3), padding=1),
+            nn.Conv2d(64, 128, (3, 3), padding=1),
+            nn.LeakyReLU(0.1),
             nn.MaxPool2d(2,2),
-            nn.Conv2d(32, 256, (4, 4), padding=1),
-            nn.LeakyReLU(0.01),
+            nn.Conv2d(128, 256, (3, 3), padding=1),
+            nn.Conv2d(256, 512, (3, 3), padding=1),
+            nn.LeakyReLU(0.1),
             nn.MaxPool2d(2,2),
-            
             nn.Flatten(),
-            nn.Linear(256*6*6, 10)
+            nn.Linear(512*7*7, 10)
         )
         
 
@@ -220,6 +221,9 @@ plt.plot(df['val_loss'], linestyle='-', label="val_loss")
 plt.legend()
 plt.grid()
 plt.show()
+
+'''
+
 
 # LeNet like model
 class LeNet_like(pl.LightningModule):
@@ -291,3 +295,4 @@ plt.grid()
 plt.show()
 
 
+'''
