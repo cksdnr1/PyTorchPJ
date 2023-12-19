@@ -67,7 +67,7 @@ plt.imshow(trainDataLoader.dataset.data[0])
 batch_n = len(trainDataLoader.dataset.data) // _batch_size
 batch_n
 
-_epochs = 10
+_epochs = 2
 '''
 # MLP model
 class MLP(pl.LightningModule):

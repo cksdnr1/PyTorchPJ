@@ -42,83 +42,6 @@ from torch.utils import data
 from torch.utils.data import DataLoader
 import torch.optim.lr_scheduler as lr_scheduler 
 
-'''
-class Model(pl.LightningModule):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.flatten =  nn.Flatten()
-        self.linear1 = nn.Linear(28*28, 32)
-        self.linear2 = nn.Linear(28*28, 32)
-        self.linear3 = nn.Linear(64, 10)
-        self.relu = nn.ReLU()
-    
-    def forward(self, x):
-        x = self.flatten(x)
-        x1 = self.linear1(x)
-        x1 = self.relu(x1)
-        x2 = self.linear2(x)
-        x2 = self.relu(x2)
-        x = torch.cat([x1, x2], dim=1)
-        x = self.linear3(x)
-        return x
-
-# model = Model()
-# summary(model, input_size=(8, 1, 28, 28))
-
-loss_function = nn.CrossEntropyLoss()
-class MyModel(pl.LightningModule):
-    def __init__(self):
-        super(MyModel, self).__init__()
-        self.layers =  Model()
-    
-    def forward(self, x):
-        out = self.layers(x)
-        return out
-    
-    def predict_step(self, x, batch_idx):
-        y_pred = self(x) 
-        y_pb = nn.Softmax(y_pred)
-        return y_pb
-
-    def training_step(self, batch, batch_idx):
-        x, y = batch
-        y_pred = self(x) 
-        loss = loss_function(y_pred, y)
-        acc = FM.accuracy(y_pred, y, task="multiclass",num_classes=10)
-        mse = FM.mean_squared_error(torch.argmax(y_pred, dim=1), y)
-        metrics={'loss': loss, 'acc':acc, 'mse': mse}
-        self.log_dict(metrics,prog_bar=True)#on_step=True, on_epoch=True)
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self(x)
-        loss = loss_function(y_hat, y)
-        acc = FM.accuracy(y_hat, y, task="multiclass",num_classes=10)
-        mse = FM.mean_squared_error(torch.argmax(y_hat, dim=1), y)
-        metrics={'val_loss': loss, 'val_acc':acc, 'val_mse': mse}
-        self.log_dict(metrics) #on_step=False, on_epoch=True
-        return 
-
-    def test_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self(x)
-        loss = loss_function(y_hat, y)
-        acc = FM.accuracy(y_hat, y, task="multiclass",num_classes=10)
-        mse = FM.mean_squared_error(torch.argmax(y_hat, dim=1), y)
-        metrics={'val_loss': loss, 'val_acc':acc, 'val_mse': mse}
-        self.log_dict(metrics) #on_step=False, on_epoch=True
-        return 
-
-    def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.001)
-
-model = MyModel()
-#summary(model, input_size=(8, 1, 28, 28))
-
-
-'''
-
 class MNISTDataModule(pl.LightningDataModule):
   def __init__(self, data_dir: str = '', batch_size: int = 32):
     super().__init__()
@@ -380,8 +303,6 @@ InverseTimeDecay = lambda epoch: 1 / (1 +
 
 lr_polt(InverseTimeDecay,epochs=100,lr_start=lr_start)
 
-'''
-
 from torch.optim import Adam
 lr = 0.005
 loss_function = nn.CrossEntropyLoss()
@@ -504,7 +425,6 @@ plt.legend()
 plt.grid()
 plt.show() 
 
-'''
 #!printenv
 
 #!env CUBLAS_WORKSPACE_CONFIG=:16:8 or CUBLAS_WORKSPACE_CONFIG=:4096:8
@@ -517,6 +437,7 @@ plt.show()
 #%load_ext tensorboard  
 %reload_ext tensorboard
 %tensorboard --logdir ./tb_logs  
+'''
 
 loss_function = nn.CrossEntropyLoss()
 class Model(pl.LightningModule):
@@ -546,6 +467,11 @@ class Model(pl.LightningModule):
         metrics={'loss':loss, 'acc':acc}
         self.log_dict(metrics)
         return loss
+
+    def predict_step(self, x, batch_idx):
+        y_pred = self(x) 
+        y_pb = nn.Softmax(y_pred)
+        return y_pb
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
@@ -554,6 +480,17 @@ class Model(pl.LightningModule):
         acc = FM.accuracy(y_pred, y, task="multiclass",num_classes=10)
         metrics = {'val_loss':loss, 'val_acc':acc}
         self.log_dict(metrics)
+
+
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = loss_function(y_hat, y)
+        acc = FM.accuracy(y_hat, y, task="multiclass",num_classes=10)
+        mse = FM.mean_squared_error(torch.argmax(y_hat, dim=1), y)
+        metrics={'val_loss': loss, 'val_acc':acc, 'val_mse': mse}
+        self.log_dict(metrics) #on_step=False, on_epoch=True
+        return 
     
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.001)
@@ -574,12 +511,6 @@ trainer = pl.Trainer(max_epochs=100, logger=logger,
                      accelerator='auto',overfit_batches=0.3)
 trainer.fit(model, data_module)
 
-# colab(linux)
-!rm -rf ./logs/*
-!rm -rf ./aicamp/*
-# windows
-# code/logs code/aicamp 폴더 삭제해 주세요
-
 checkpoint_callback = pl.callbacks.ModelCheckpoint(
     monitor='val_acc',
     dirpath='./aicamp/',
@@ -590,10 +521,8 @@ trainer = pl.Trainer(max_epochs=10, logger=logger,
                      callbacks=[checkpoint_callback],accelerator='auto',overfit_batches=0.3)
 trainer.fit(model, data_module)
 
-%ls 'aicamp' 
-
 # file name 수정!! 
-checkpoint_path = "aicamp/epoch=08-val_acc=0.9701.ckpt"  
+checkpoint_path = "aicamp/epoch=08-val_acc=0.9727.ckpt"  
 # 모델 읽어오기
 new_model = model.load_from_checkpoint(checkpoint_path)
 trainer.validate(new_model, data_module)
@@ -662,7 +591,3 @@ for param_tensor in model.state_dict():
 
 ## state_dict 내부 구조 확인 
 p(model.state_dict())  
-
-
-
-'''
